@@ -1,0 +1,38 @@
+# Application Types
+
+- The type of application is defined after the requirements are set
+- Types of applications:
+  - **Web Application:**
+    - The most common type of application after APIs
+    - They are the way the internet worked since its inception
+    - They're hosted on one or more servers and accessed via a web browser
+    - They communicate with the server using HTTP
+    - They use HTML, CSS, and JavaScript to render the UI
+    - It's best suited for applications that need an UI, user initiated events, large scale, and short/focused actions within a request-response cycle
+  - **Web API (Application Programming Interface):**
+    - It serves data to other applications
+    - Its client is not a web browser but another application
+    - The most popular type of API is REST which means Representational State Transfer and is based on HTTP
+      - It uses URLs to identify resources, parameters to filter data, and HTTP methods to perform actions (GET, POST, PUT, DELETE)
+    - It's best suited for applications that need data retrieval and storage, client initiated actions, large scale, and short/focused actions within a request-response cycle
+  - **Mobile Application:**
+    - It runs on mobile devices
+    - They work well with Web APIs
+    - They're best suited for user interaction, offline access, front-end for a Web API, location-based services, and push notifications
+  - **Console Application:**
+    - It runs in a terminal or command line interface so it doesn't have a graphical user interface
+    - They require technical knowledge to be used
+    - They can run long or short processes
+    - It's best suited for applications that need to run in the background, perform batch processing, and have no user interaction
+  - **Services**
+    - They are like console applications but they run in the background and are not started by the user
+    - They're managed by the service manager
+    - They're best suited for long-running processes, background tasks, and scheduled tasks
+  - **Desktop Application:**
+    - It has all of its resources on the local machine (including logic, data, and UI)
+    - It might or not have a network connection
+    - They usually need a great UI
+    - They're best suited for user centric actions (like word processing), gaming
+- Even though we covered different types of applications, it's important to recall that there are other types of applications, like functions as a service (lambda)
+- It's important to define these early
+- A project can have only one or several types

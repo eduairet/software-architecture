@@ -7,6 +7,7 @@ Software architecture notes and exercises.
 1. [Intro](./_notes/01-introduction.md)
 2. [The Architecture Process](./_notes/02-architecture-process.md)
 3. [System Requirements](./_notes/03-system-requirements.md)
+4. [Application Types](./_notes/04-application-types.md)
 
 ### References
 
