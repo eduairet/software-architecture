@@ -1,4 +1,4 @@
-# The Architecture Process
+# Software Architecture
 
 Software architecture notes and exercises.
 
