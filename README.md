@@ -9,6 +9,7 @@ Software architecture notes and exercises.
 3. [System Requirements](./_notes/03-system-requirements.md)
 4. [Application Types](./_notes/04-application-types.md)
 5. [Selecting Technology Stack](./_notes/05-selecting-technology-stack.md)
+6. [Quality Attributes](./_notes/06-quality-attributes.md)
 
 ### References
 
