@@ -11,6 +11,7 @@ Software architecture notes and exercises.
 5. [Selecting Technology Stack](./_notes/05-selecting-technology-stack.md)
 6. [Quality Attributes](./_notes/06-quality-attributes.md)
 7. [Components](./_notes/07-components.md)
+8. [Design Patterns](./_notes/08-design-patterns.md)
 
 ### References
 
