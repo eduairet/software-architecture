@@ -12,6 +12,7 @@ Software architecture notes and exercises.
 6. [Quality Attributes](./_notes/06-quality-attributes.md)
 7. [Components](./_notes/07-components.md)
 8. [Design Patterns](./_notes/08-design-patterns.md)
+9. [System Architecture](./_notes/09-system-architecture.md)
 
 ### References
 
