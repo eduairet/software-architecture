@@ -13,6 +13,7 @@ Software architecture notes and exercises.
 7. [Components](./_notes/07-components.md)
 8. [Design Patterns](./_notes/08-design-patterns.md)
 9. [System Architecture](./_notes/09-system-architecture.md)
+10. [External Considerations](./_notes/10-external-considerations.md)
 
 ### References
 
