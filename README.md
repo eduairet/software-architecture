@@ -15,6 +15,7 @@ Software architecture notes and exercises.
 9. [System Architecture](./_notes/09-system-architecture.md)
 10. [External Considerations](./_notes/10-external-considerations.md)
 11. [Architecture Document](./_notes/11-architecture-document.md)
+12. [Case Study](./_notes/12-case-study.md)
 
 ### References
 
