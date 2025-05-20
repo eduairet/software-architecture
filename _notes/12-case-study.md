@@ -114,3 +114,20 @@
   - Logs the requests made by the users to the database.
   - Logs the successful requests to the database.
   - Logs the request errors to the database.
+
+## Choosing Messaging Methods
+
+- Receiver
+  - The receiver will be the rest API, it will be the entry point for the users to interact with the system.
+  - Rest API is the best option here because it needs to respond to simple request and response messages to map the UI and to handle the user requests and the data.
+  - It will use JWT tokens to authenticate the users and to authorize the requests.
+- Handler
+  - The data won't be very big, so transport it through JSON and TEXT responses wil be more than enough.
+- Info
+  - The UI is the is the info layer, it will be a web application that will be used by the users to create their artworks and alphabets.
+- Data store
+  - An SQL database will be used to store the data, we need this kind to make easier relations between the artworks, alphabets and users.
+  - The database will be hosted in a cloud provider to make it easier to scale and to avoid data loss.
+- Logger
+  - The system can handle the logs in a database, because of the low volume of data it will be the same as the rest of the system just in a different table.
+  - When a message is logged, a notification will be sent to a discord channel to notify the developers about the error.
