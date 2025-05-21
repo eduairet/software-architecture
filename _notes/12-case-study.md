@@ -53,7 +53,7 @@
     - Password (hashed)
     - Email
     - Profile picture
-    - GitHub id
+    - GitHub
   - The artworks and alphabets are stored in a database as text strings with their metadata.
     - Artworks:
       - Artwork ID
@@ -120,9 +120,9 @@
 - Receiver
   - The receiver will be the rest API, it will be the entry point for the users to interact with the system.
   - Rest API is the best option here because it needs to respond to simple request and response messages to map the UI and to handle the user requests and the data.
-  - It will use JWT tokens to authenticate the users and to authorize the requests.
 - Handler
-  - The data won't be very big, so transport it through JSON and TEXT responses wil be more than enough.
+  - The data won't be very big, so transport it through JSON and TEXT request/responses wil be more than enough.
+  - It will use JWT tokens to authenticate the users and to authorize the requests.
 - Info
   - The UI is the is the info layer, it will be a web application that will be used by the users to create their artworks and alphabets.
 - Data store
@@ -131,3 +131,40 @@
 - Logger
   - The system can handle the logs in a database, because of the low volume of data it will be the same as the rest of the system just in a different table.
   - When a message is logged, a notification will be sent to a discord channel to notify the developers about the error.
+
+## Designing the Logging Service
+
+- The logging service will be a microservice that will be responsible for logging the requests made by the users to the database.
+- It will record the request ID, correlation ID, user ID, request date, request type and message after every request is made, so it will be injected in the receiver.
+- Our receiver will be a rest API written in .NET Core, which will be the entry point for the logging service.
+
+```
+-> Polling (it will poll the database to get the logs)
+-> Business Logic (it handles the requests and responses and logs the requests)
+-> Data Access Layer (it stores the data in the database), we'll use Entity Framework to make it easier to access the database.
+```
+
+## Designing the Receiver
+
+- The receiver will be a REST API written in .NET Core exposing the endpoints to handle the requests made by the users.
+
+```
+|———————————————————|—————————|
+| Service Interface |         |
+|———————————————————|         |
+| Business Logic    | Logging |
+|———————————————————|         |
+| Data Access Layer |         |
+|———————————————————|—————————|
+```
+
+## Designing the Handler
+
+- The handler will validate the requests made by the users and will process the data to be sent to the receiver.
+- This will be injected in the receiver as a service, to handle authentication and authorization.
+- We'll use JWT tokens to authenticate the users and to authorize the requests.
+
+## Designing the Info Service
+
+- This will be a web application that will be used by the users to create their artworks and alphabets.
+- The technology stack will be Astro with TypeScript, and Tailwind CSS.
