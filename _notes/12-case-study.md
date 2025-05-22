@@ -2,45 +2,94 @@
 
 ## ASCII Type Generator
 
-- A website that generates lettering artworks from users' inputs, it uses ASCII art alphabets created by other users to map the characters provided by the user.
-- Users need to register to create their own ASCII artworks or upload their own alphabets, all their content is accessible via an user dashboard.
-- The latest 10 artworks are initially displayed on the homepage but scrolling down will make more and more elements appear.
-- Words can be searched by their name or by the name of the user who created them.
+### Fullstack Web Application
 
-## Requirements
+#### Architecture Document
 
-- **Functional Requirements**
+**Written by:** Eduardo Aire Torres
+**Date:** 2025-05-21
 
-  - Allow users to register, login, create/edit/delete ASCII artworks, and upload/delete their own ASCII alphabets.
-  - Store the artworks and alphabets in a database, and show the artworks to other users, allowing them to search for them.
-  - Add a revenue model to the website, allowing users to donate to the project by sending to a crypto Address, and by adding adds to the website.
+## Table of Contents
 
-- **Non-Functional Requirements**
+- [ASCII Type Generator](#ascii-type-generator)
 
-  - Details:
-    - Messages are created by the users, so the amount of data depends on the popularity of the website.
-    - Since ASCII art is a nerdy topic from the old days of the internet, the website will probably not be very popular, so we can assume that the amount of data will be small.
-    - Peak usage estimation: 100 users, 3 artworks per user, 1 alphabet per user since they can take a long time to create.
-    - Expected artworks per month: 100×3×30=9000, where each artwork is approximately 1KB, giving us a total of 9MB of data per month.
-    - Expected alphabets per month: 100×1×30=3000, where each alphabet is approximately 10KB, giving us a total of 150MB of data per month.
-    - Yearly data:
-      - Artworks: 9MB×12=108MB
-      - Alphabets: 150MB×12=1.8GB
-      - Total: 1.9GB
-    - We need to ensure that the artworks and alphabets are stored to avoid data loss, so when there's an upload failure, the user should stay in the loop to try again.
-    - Concurrent artworks and alphabets are expected to be less than 500, so we can assume that the database will be able to handle the load.
-    - Concurrent users are expected to be less than 100
-    - Total number of users is expected to be less than 1000
-    - The SLA (Service Level Agreement) Level of the website should be Platinum:
-      - Fully stateless
-      - Easily scalable
-      - Logged and monitored
-  - Summary:
-    - Data Volume: 1.9GB annually
-    - Less than 100 concurrent requests
-    - No data loss, keep the user in the loop
-    - Less than 1000 users registered
-    - SLA Level: Platinum
+  - [Background](#background)
+  - [Requirements](#requirements)
+    - [Functional Requirements](#functional-requirements)
+    - [Non-Functional Requirements](#non-functional-requirements)
+  - [Executive Summary](#executive-summary)
+  - [Overall Architecture](#overall-architecture)
+    - [Services](#overall-architecture-services)
+    - [Scaling](#overall-architecture-scaling)
+    - [Messaging](#overall-architecture-messaging)
+  - [Services Drill Down](#services-drill-down)
+    - [Logging](#logging)
+      - [Role](#logging-role)
+      - [Technology Stack](#logging-technology-stack)
+      - [Architecture](#logging-architecture)
+      - [Implementation Instructions](#logging-implementation)
+    - [Receiver](#receiver)
+      - [Role](#receiver-role)
+      - [Technology Stack](#receiver-technology-stack)
+      - [Architecture](#receiver-architecture)
+      - [Implementation Instructions](#receiver-implementation)
+    - [Handler](#handler)
+      - [Role](#handler-role)
+      - [Technology Stack](#handler-technology-stack)
+      - [Architecture](#handler-architecture)
+      - [Implementation Instructions](#handler-implementation)
+    - [Info](#info)
+      - [Role](#info-role)
+      - [Technology Stack](#info-technology-stack)
+      - [Architecture](#info-architecture)
+      - [Implementation Instructions](#info-implementation)
+
+<h2 id="background">Background</h2>
+
+The ASCII Type Generator is an innovative web application that empowers users to create and share stunning ASCII art lettering and alphabets.
+
+With a user-friendly and intuitive interface, the application ensures that users can effortlessly produce their ASCII art while easily browsing and searching through an extensive collection of creations made by others.
+
+This platform serves a clear purpose: to unleash creativity and allow users to share their ASCII art with the world. It captures the nostalgia of the early days of the internet and emphasizes the distinct art of crafting typography in a bold, unconventional manner.
+
+The application effectively stores all ASCII art created by users, enabling them to search, share, and manage their artworks through a powerful user dashboard.
+
+Users initially have access to 3 artworks and 1 alphabet. However, by opting for a premium creator subscription, they can unlock unlimited possibilities, creating as many artworks and alphabets as they desire.
+
+This document meticulously details the architecture of the application, highlighting the services used, the technology stack, and the comprehensive design of the system.
+
+<h2 id="requirements">Requirements</h2>
+
+<h3 id="functional-requirements">Functional Requirements</h3>
+
+1. Enable users to register, log in, create, edit, and delete ASCII artworks, as well as upload and delete their own ASCII alphabets.
+2. Store the artworks and alphabets in a database, and display them to other users with a search feature.
+3. Implement a revenue model for the website that allows users to subscribe for unlimited uploads and incorporates advertisements on the site.
+
+<h3 id="non-functional-requirements">Non-Functional Requirements</h3>
+
+1. **Data Volume**: 1.9 GB annually
+2. **Load**: Fewer than 100 concurrent requests
+3. **Number of Users**: Fewer than 1,000 registered users
+4. **Error Handling**: Data loss may occur, but users will be informed to try again (proper error handling is in place)
+5. **Service Level Agreement (SLA) Level**: Platinum (fully stateless, easily scalable, logged, and monitored)
+
+<h2 id="executive-summary">Executive Summary</h2>
+
+The ASCII Type Generator is a web application that allows users to create and share ASCII art lettering and alphabets. The application is designed to be user-friendly and intuitive, enabling users to easily create their ASCII art and browse through an extensive collection of creations made by others.
+
+The objective of the application is to create a space where users can have fun and unleash their creativity while sharing their ASCII art with the world.
+
+The main focuses of the application are:
+
+- **User Experience**: The application is designed to be user-friendly and intuitive, ensuring that users can easily create their ASCII art and browse through an extensive collection of creations made by others.
+- **Creativity**: The application allows users to unleash their creativity and share their ASCII art with the world in a simple and effective way (just by filling an input for the artwork and uploading a TXT file for the alphabet).
+- **Community**: The application creates a space where users can share their ASCII art with the world and browse through an extensive collection of creations made by others.
+- **Low Cost**: The application is designed to be low-cost, with a revenue model that allows users to subscribe for unlimited uploads and incorporates advertisements on the site and will help to cover the costs of the application and its scalability.
+
+To achieve these objectives, the application is based on an hexagonal architecture, which allows for better separation of concerns and makes it easier to maintain and scale. The technology stack used for the application is .NET Core for the backend, Entity Framework for the data access layer, and Astro with TypeScript and Tailwind CSS for the frontend. This specific stack will allow us to create a lightweight and fast application that is easy to maintain and scale, besides being a low-cost solution.
+
+![Overall Architecture](../_assets/img/overall-architecture.png)
 
 ## Mapping the Components
 
