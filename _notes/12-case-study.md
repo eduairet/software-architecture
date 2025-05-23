@@ -76,112 +76,53 @@ This document meticulously details the architecture of the application, highligh
 
 <h2 id="executive-summary">Executive Summary</h2>
 
-The ASCII Type Generator is a web application that allows users to create and share ASCII art lettering and alphabets. The application is designed to be user-friendly and intuitive, enabling users to easily create their ASCII art and browse through an extensive collection of creations made by others.
+The ASCII Type Generator is a web application that enables users to create and share ASCII art lettering and alphabets. Designed to be user-friendly and intuitive, this application allows users to easily craft their ASCII art and explore a vast collection of creations made by others.
 
-The objective of the application is to create a space where users can have fun and unleash their creativity while sharing their ASCII art with the world.
+The goal of the application is to provide a space where users can have fun, unleash their creativity, and share their ASCII art with the world.
 
 The main focuses of the application are:
 
-- **User Experience**: The application is designed to be user-friendly and intuitive, ensuring that users can easily create their ASCII art and browse through an extensive collection of creations made by others.
-- **Creativity**: The application allows users to unleash their creativity and share their ASCII art with the world in a simple and effective way (just by filling an input for the artwork and uploading a TXT file for the alphabet).
-- **Community**: The application creates a space where users can share their ASCII art with the world and browse through an extensive collection of creations made by others.
-- **Low Cost**: The application is designed to be low-cost, with a revenue model that allows users to subscribe for unlimited uploads and incorporates advertisements on the site and will help to cover the costs of the application and its scalability.
+- **User Experience**: The application is designed to be intuitive and easy to use, allowing users to create ASCII art effortlessly and browse a wide range of creations made by others.
+- **Creativity**: It encourages users to express their creativity and share their ASCII art simply by entering text for the artwork and uploading a TXT file for the alphabet.
+- **Community**: The application fosters a community where users can share their ASCII art and explore an extensive collection of works from other users.
+- **Affordability**: Designed to be low-cost, the application features a subscription model for unlimited uploads and includes advertisements to help cover operational expenses and support scalability.
 
-To achieve these objectives, the application is based on an hexagonal architecture, which allows for better separation of concerns and makes it easier to maintain and scale. The technology stack used for the application is .NET Core for the backend, Entity Framework for the data access layer, and Astro with TypeScript and Tailwind CSS for the frontend. This specific stack will allow us to create a lightweight and fast application that is easy to maintain and scale, besides being a low-cost solution.
+To achieve these objectives, the application is built on a microservices architecture with a shared database to simplify scalability and maintenance. The technology stack includes SQLite for the database, .NET Core for the backend, Entity Framework for data access, and Astro with TypeScript and Tailwind CSS for the frontend, resulting in a lightweight and efficient application.
 
 ![Overall Architecture](../_assets/img/overall-architecture.png)
 
-## Mapping the Components
+<h2 id="overall-architecture">Overall Architecture</h2>
 
-- Receiver
-  - User:
-    - User ID
-    - Registration date
-    - Last update
-    - Username
-    - Password (hashed)
-    - Email
-    - Profile picture
-    - GitHub
-  - The artworks and alphabets are stored in a database as text strings with their metadata.
-    - Artworks:
-      - Artwork ID
-      - User ID
-      - Creation date
-      - Last update
-      - Text
-      - Art
-    - Alphabets:
-      - Alphabet ID
-      - User ID
-      - Creation date
-      - Last update
-      - Name
-      - Description
-      - Alphabet
-  - Logging:
-    - Request ID
-    - Correlation ID
-    - User ID
-    - Request date
-    - Request type
-    - Message
-- Handler:
-  - Register:
-    - It creates a new user in the database:
-      - It can be done via GitHub without a password and account activation.
-      - It can be done via email with a password and account activation.
-  - Login:
-    - It checks the credentials provided by the user and returns a token to be used in the next requests.
-  - Artworks:
-    - It processes and validates the text from an input provided by the user:
-      - Authentication.
-      - Invisible captcha.
-      - The text is validated by just accepting ASCII characters.
-      - The length of the text is limited to 20 characters.
-  - Alphabets:
-    - TXT files uploaded by the user:
-      - Authentication
-      - Invisible captcha
-      - Validation:
-        - They have only valid ASCII characters.
-        - They are TXT files (prevent attacks).
-        - They are les than 50kB.
-        - They have the alphabet structure.
-- Information provider
-  - Artworks:
-    - User Artworks: It returns the artworks of a user.
-    - Latest Artworks: It returns the latest 10 artworks allowing pagination.
-    - Artwork by name: It returns the artworks by their name.
-    - Artwork by user name: It returns the artworks by their user name.
-  - Alphabets:
-    - User Alphabets: It returns the alphabets of a user.
-    - Alphabets: It returns a catalog with all the alphabets.
-    - Alphabet by name: It returns the alphabets by their name.
-    - Alphabet by user name: It returns the alphabets by their user name.
-- Logger:
-  - Logs the requests made by the users to the database.
-  - Logs the successful requests to the database.
-  - Logs the request errors to the database.
+This diagram illustrates the application's architecture. Although it is not fully microservices-based due to the shared database, it allows each service to be encapsulated, facilitating communication between them and access through the API gateway.
 
-## Choosing Messaging Methods
+![Overall Architecture Detailed](../_assets/img/overall-architecture-detailed.png)
 
-- Receiver
-  - The receiver will be the rest API, it will be the entry point for the users to interact with the system.
-  - Rest API is the best option here because it needs to respond to simple request and response messages to map the UI and to handle the user requests and the data.
-- Handler
-  - The data won't be very big, so transport it through JSON and TEXT request/responses wil be more than enough.
-  - It will use JWT tokens to authenticate the users and to authorize the requests.
-- Info
-  - The UI is the is the info layer, it will be a web application that will be used by the users to create their artworks and alphabets.
-- Data store
-  - An SQL database will be used to store the data, we need this kind to make easier relations between the artworks, alphabets and users.
-  - The database will be hosted in a cloud provider to make it easier to scale and to avoid data loss.
-- Logger
-  - The system can handle the logs in a database, because of the low volume of data it will be the same as the rest of the system just in a different table.
-  - When a message is logged, a notification will be sent to a discord channel to notify the developers about the error.
+<h3 id="overall-architecture-services">Services</h3>
 
-## Designing the Logging Service
+- **Receiver:** The receiver consists of microservices that will process user requests, validate the data, and store it in the database.
+
+- **Handler:** The handler is the API gateway, responsible for routing user requests to the appropriate microservice and returning the responses to the users.
+
+- **Info:** The info layer refers to the client application, which displays data to users and allows them to interact with the system.
+
+- **Logging:** The logger is a microservice responsible for logging user requests in the database, including both successful requests and errors.
+
+<h3 id="overall-architecture-scaling">Scaling</h3>
+
+The application is designed to be easily scalable, allowing for the addition of more microservices as needed to manage increased load. The microservices are stateless, which makes them straightforward to replicate and distribute across multiple servers with load balancing.
+
+The database is hosted with a cloud provider, facilitating easier scalability and minimizing the risk of data loss.
+
+<h3 id="overall-architecture-messaging">Messaging</h3>
+
+The application will use a message broker to handle the communication between the microservices. This will allow for asynchronous communication and decoupling of the services, making it easier to scale and maintain the application.
+
+- **Receiver:** The receiver is the stack of services that will be responsible for processing the requests made by the users in an asynchronous, independent way. Only the API gateway can call the receiver, ant is the only way to process data from or to the database.
+- **Handler:** The handler is the API gateway, it exposes all the API/HTTP endpoints to the users and routes the requests to the correct microservice. It will also handle authentication and authorization of the requests.
+- **Info:** The info layer is the client application, it will consume the API exposed by the handler and will be responsible for displaying the data to the users and allowing them to interact with the system.
+- **Logging:** The logging will be injected in the receiver, and info layer, to log the requests made by the users to the database in the backend and in the frontend it will log the outcome of the operations that are isolated from the backend, like a Google Maps API call that fails.
+
+<h2 id="services-drill-down">Services Drill Down</h2>
 
 - The logging service will be a microservice that will be responsible for logging the requests made by the users to the database.
 - It will record the request ID, correlation ID, user ID, request date, request type and message after every request is made, so it will be injected in the receiver.
