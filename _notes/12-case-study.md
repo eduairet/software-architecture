@@ -2,9 +2,7 @@
 
 ## ASCII Type Generator
 
-### Fullstack Web Application
-
-#### Architecture Document
+### Architecture Document
 
 **Written by:** Eduardo Aire Torres
 **Date:** 2025-05-21
@@ -132,7 +130,7 @@ The logging service is responsible for recording all user requests, including su
 
 <h4 id="logging-technology-stack">Technology Stack</h4>
 
-It's going to be a simple service that will be written in .NET Core, using Entity Framework for data access which will communicate with the SQLite database to write the records, it will be injected in the receiver to log the requests, since it's a different technology from the frontend, we will not inject it there.
+The service will be developed using .NET Core and will utilize Entity Framework for data access. It will communicate with an SQLite database to manage records. Logging of requests will be handled in the receiver, as it is a different technology from the frontend, and therefore, we will not inject it there.
 
 <h4 id="logging-architecture">Architecture</h4>
 
@@ -145,3 +143,8 @@ The logging service will follow a classic layered architecture with three layers
 This structure allows the logging service to be easily injected and used internally by other components, rather than being accessed via external HTTP endpoints.
 
 ![Logging Architecture](../_assets/img/logging-architecture.png)
+
+<h4 id="logging-implementation">Implementation Instructions</h4>
+
+1. Use dependency injection to inject the logging service into the receiver.
+2. Handle Database interactions using Entity Framework.
