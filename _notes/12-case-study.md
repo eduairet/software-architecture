@@ -130,7 +130,7 @@ The logging service is responsible for recording all user requests, including su
 
 <h4 id="logging-technology-stack">Technology Stack</h4>
 
-The service will be developed using .NET Core and will utilize Entity Framework for data access. It will communicate with an SQLite database to manage records. Logging of requests will be handled in the receiver, as it is a different technology from the frontend, and therefore, we will not inject it there.
+The service will be developed using .NET Core and will utilize Entity Framework for data access. It will communicate with an SQLite database to manage records. Logging of requests will be handled in the handler, as it is a different technology from the info layer, and therefore, we will not inject it there.
 
 <h4 id="logging-architecture">Architecture</h4>
 
@@ -138,7 +138,7 @@ The logging service will follow a classic layered architecture with three layers
 
 - **Data Access Layer:** Handles interactions with the database.
 - **Business Logic Layer:** Processes and formats log data received from the application.
-- **Service Interface:** Exposes methods for logging requests and errors, which can be called by the receiver.
+- **Service Interface:** Exposes methods for logging requests and errors, which can be called by the handler.
 
 This structure allows the logging service to be easily injected and used internally by other components, rather than being accessed via external HTTP endpoints.
 
@@ -146,7 +146,7 @@ This structure allows the logging service to be easily injected and used interna
 
 <h4 id="logging-implementation">Implementation Instructions</h4>
 
-- Use dependency injection to inject the logging service into the receiver.
+- Use dependency injection to inject the logging service into the handler.
 
 <h3 id="receiver">Receiver</h3>
 
@@ -156,7 +156,9 @@ The receiver will be developed using .NET Core, facilitating easy integration wi
 
 <h4 id="receiver-technology-stack">Technology Stack</h4>
 
-The receiver will be developed using .NET Core, facilitating easy integration with the handler. It will utilize Entity Framework for data access and will process requests asynchronously. However, it won't use a message broker for communication, as the receiver will be called directly by the API gateway.
+The receiver will be developed using .NET Core, facilitating easy integration with the handler. It will utilize Entity Framework for data access and will process requests asynchronously.
+Even though there is a logging service, each service in the receiver will retrieve the logs related to its operations, this will allow to maintain a clear separation of concerns, keeping the logging service focused on logging requests and errors, while each receiver service gets its own logs.
+However, it won't use a message broker for communication, as the receiver will be called directly by the API gateway.
 
 <h4 id="receiver-architecture">Architecture</h4>
 
@@ -172,3 +174,85 @@ The receiver architecture will be the following:
 <h4 id="receiver-implementation">Implementation Instructions</h4>
 
 - Use dependency injection to inject the different services into the receiver's controllers.
+
+<h3 id="handler">Handler</h3>
+
+<h4 id="handler-role">Role</h4>
+
+The handler is the API gateway that exposes all the API/HTTP endpoints to the users and routes the requests to the correct microservice. It will also handle authentication and authorization of the requests.
+
+<h4 id="handler-technology-stack">Technology Stack</h4>
+
+The handler will be developed using .NET Core, which provides a robust framework for building APIs. It will utilize Entity Framework for data access and will communicate with the receiver services to process requests.
+
+<h4 id="handler-architecture">Architecture</h4>
+
+The handler architecture will be the following:
+
+![Handler Architecture](../_assets/img/handler-architecture.png)
+
+The handler will consist of the following components:
+
+- **REST API:** The handler will expose a REST API that will be consumed by the info layer.
+- **Authentication & Authorization:** The handler will implement JWT for authentication and authorization, ensuring that only authenticated users can access the API endpoints.
+- **Business Logic:** The handler will contain the business logic for processing requests and routing them to the appropriate receiver service, it will be connected to the logging service to log all requests and errors.
+- **API Endpoints:** The handler will expose the following API endpoints:
+
+  | Endpoint                                                   | Description                                                        | Methods                | Response Statuses       | Authenticated                 |
+  | ---------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------- | ----------------------- | ----------------------------- |
+  | `/api/artworks?searchText={string}&skip={int}&take={int}`  | Search artworks by text with pagination; returns all if no params  | GET                    | 200, 400, 401, 500      | No                            |
+  | `/api/artworks/{id}`                                       | Manage/view individual artwork (view, edit, delete)                | GET, POST, PUT, DELETE | 200, 400, 401, 404, 500 | GET: No, POST/PUT/DELETE: Yes |
+  | `/api/artworks/user`                                       | Retrieve artworks created by the authenticated user                | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/artworks/logs`                                       | Retrieve artwork logs for the authenticated user                   | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/alphabets?searchText={string}&skip={int}&take={int}` | Search alphabets by text with pagination; returns all if no params | GET                    | 200, 400, 401, 500      | No                            |
+  | `/api/alphabets/{id}`                                      | Manage/view individual alphabet (view, delete)                     | GET, DELETE            | 200, 400, 401, 404, 500 | GET: No, DELETE: Yes          |
+  | `/api/alphabets/upload`                                    | Upload a new alphabet                                              | POST                   | 201, 400, 401, 500      | Yes                           |
+  | `/api/alphabets/user`                                      | Retrieve alphabets uploaded by the authenticated user              | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/alphabets/logs`                                      | Retrieve alphabet logs for the authenticated user                  | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/users/register`                                      | User registration                                                  | POST                   | 201, 400, 409, 500      | No                            |
+  | `/api/users/login`                                         | User login                                                         | POST                   | 200, 400, 401, 500      | No                            |
+  | `/api/users/refresh`                                       | Refresh user authentication token                                  | POST                   | 200, 401, 500           | Yes                           |
+  | `/api/users/logout`                                        | User logout                                                        | POST                   | 200, 401, 500           | Yes                           |
+  | `/api/users/profile`                                       | Manage user profile (view, update, delete)                         | GET, PUT, DELETE       | 200, 400, 401, 404, 500 | Yes                           |
+  | `/api/users/logs`                                          | Retrieve user logs for the authenticated user                      | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/subscription/subscribe`                              | Subscribe to premium creator plan                                  | POST                   | 201, 400, 401, 402, 500 | Yes                           |
+  | `/api/subscription/cancel`                                 | Cancel a subscription                                              | POST                   | 200, 400, 401, 404, 500 | Yes                           |
+  | `/api/subscription/status`                                 | Check subscription status                                          | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/subscription/logs`                                   | Retrieve subscription logs for the authenticated user              | GET                    | 200, 401, 404, 500      | Yes                           |
+  | `/api/ads`                                                 | Retrieve advertisements to display                                 | GET                    | 200, 204, 400, 500      | No                            |
+  | `/api/ads/click`                                           | Log an advertisement click                                         | POST                   | 200, 400, 401, 500      | No                            |
+  | `/api/ads/logs`                                            | Retrieve advertisement logs for the authenticated user             | GET                    | 200, 401, 404, 500      | Yes                           |
+
+<h4 id="handler-implementation">Implementation Instructions</h4>
+
+- The REST API will be implemented using the repository pattern, with each endpoint corresponding to a specific controller, and it will use dependency injection to inject the receiver services.
+- The logic should be minimal, basically just consuming the receiver services, handling the errors and returning the results to the user.
+- The Authentication and Authorization will be a middleware that will be executed before the request reaches the controller, it will check if the user is authenticated and authorized to access the endpoint.
+
+<h3 id="info">Info</h3>
+
+<h4 id="info-role">Role</h4>
+
+The info layer is the client application that consumes the API exposed by the handler. It will be responsible for displaying the data to the users and allowing them to interact with the system.
+
+<h4 id="info-technology-stack">Technology Stack</h4>
+
+The info layer will be developed using Astro with TypeScript and Tailwind CSS. This stack provides a straightforward way to build the site, making it easy to create a responsive and user-friendly interface with animations and transitions. Since Astro has a built-in architecture, we'll be using Astro islands to handle static and dynamic content efficiently both server-side and client-side.
+
+<h4 id="info-architecture">Architecture</h4>
+
+The info architecture will be the following:
+
+![Info Architecture](../_assets/img/info-architecture.png)
+
+The info layer will consist of the following components:
+
+- **Static Content:** The static content will be served by the Astro framework, which will generate the HTML pages at build time.
+- **Dynamic Content:** The dynamic content will be handled by the Astro islands, which will allow us to load the data from the API and render it on the client side.
+- **API Consumption:** The info layer will consume the API exposed by the handler, using the Fetch API to make requests to the endpoints and display the data to the users.
+- **User Interface:** The user interface will be built using Tailwind CSS, which will allow us to create a responsive and user-friendly interface with animations and transitions.
+
+<h4 id="info-implementation">Implementation Instructions</h4>
+
+- The info layer will be implemented using Astro with TypeScript and Tailwind CSS.
+- If possible, we won't use any third-party libraries, as Astro provides a straightforward way to build the site.
