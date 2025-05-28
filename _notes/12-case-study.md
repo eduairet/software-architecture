@@ -120,41 +120,28 @@ The application will use a message broker to handle the communication between th
 - **Receiver:** The receiver is the stack of services that will be responsible for processing the requests made by the users in an asynchronous, independent way. Only the API gateway can call the receiver, ant is the only way to process data from or to the database.
 - **Handler:** The handler is the API gateway, it exposes all the API/HTTP endpoints to the users and routes the requests to the correct microservice. It will also handle authentication and authorization of the requests.
 - **Info:** The info layer is the client application, it will consume the API exposed by the handler and will be responsible for displaying the data to the users and allowing them to interact with the system.
-- **Logging:** The logging will be injected in the receiver, and info layer, to log the requests made by the users to the database in the backend and in the frontend it will log the outcome of the operations that are isolated from the backend, like a Google Maps API call that fails.
+- **Logging:** The logging will be injected in the receiver, to log the requests made by the users to the database in the backend.
 
 <h2 id="services-drill-down">Services Drill Down</h2>
 
-- The logging service will be a microservice that will be responsible for logging the requests made by the users to the database.
-- It will record the request ID, correlation ID, user ID, request date, request type and message after every request is made, so it will be injected in the receiver.
-- Our receiver will be a rest API written in .NET Core, which will be the entry point for the logging service.
+<h3 id="logging">Logging</h3>
 
-```
--> Polling (it will poll the database to get the logs)
--> Business Logic (it handles the requests and responses and logs the requests)
--> Data Access Layer (it stores the data in the database), we'll use Entity Framework to make it easier to access the database.
-```
+<h4 id="logging-role">Role</h4>
 
-## Designing the Receiver
+The logging service is responsible for recording all user requests, including successful operations and errors, in the database. This service is crucial for monitoring the application's performance and diagnosing issues.
 
-- The receiver will be a REST API written in .NET Core exposing the endpoints to handle the requests made by the users.
+<h4 id="logging-technology-stack">Technology Stack</h4>
 
-```
-|———————————————————|—————————|
-| Service Interface |         |
-|———————————————————|         |
-| Business Logic    | Logging |
-|———————————————————|         |
-| Data Access Layer |         |
-|———————————————————|—————————|
-```
+It's going to be a simple service that will be written in .NET Core, using Entity Framework for data access which will communicate with the SQLite database to write the records, it will be injected in the receiver to log the requests, since it's a different technology from the frontend, we will not inject it there.
 
-## Designing the Handler
+<h4 id="logging-architecture">Architecture</h4>
 
-- The handler will validate the requests made by the users and will process the data to be sent to the receiver.
-- This will be injected in the receiver as a service, to handle authentication and authorization.
-- We'll use JWT tokens to authenticate the users and to authorize the requests.
+The logging service will follow a classic layered architecture with three layers:
 
-## Designing the Info Service
+- **Data Access Layer:** Handles interactions with the database.
+- **Business Logic Layer:** Processes and formats log data received from the application.
+- **Integration Layer:** Exposes logging functionality for injection into other services, enabling them to log events without exposing public API endpoints.
 
-- This will be a web application that will be used by the users to create their artworks and alphabets.
-- The technology stack will be Astro with TypeScript, and Tailwind CSS.
+This structure allows the logging service to be easily injected and used internally by other components, rather than being accessed via external HTTP endpoints.
+
+![Logging Architecture](../_assets/img/logging-architecture.png)
