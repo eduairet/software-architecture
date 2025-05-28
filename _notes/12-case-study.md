@@ -138,7 +138,7 @@ The logging service will follow a classic layered architecture with three layers
 
 - **Data Access Layer:** Handles interactions with the database.
 - **Business Logic Layer:** Processes and formats log data received from the application.
-- **Integration Layer:** Exposes logging functionality for injection into other services, enabling them to log events without exposing public API endpoints.
+- **Service Interface:** Exposes methods for logging requests and errors, which can be called by the receiver.
 
 This structure allows the logging service to be easily injected and used internally by other components, rather than being accessed via external HTTP endpoints.
 
@@ -146,5 +146,29 @@ This structure allows the logging service to be easily injected and used interna
 
 <h4 id="logging-implementation">Implementation Instructions</h4>
 
-1. Use dependency injection to inject the logging service into the receiver.
-2. Handle Database interactions using Entity Framework.
+- Use dependency injection to inject the logging service into the receiver.
+
+<h3 id="receiver">Receiver</h3>
+
+<h4 id="receiver-role">Role</h4>
+
+The receiver will be developed using .NET Core, facilitating easy integration with the handler besides of providing great performance. It will utilize Entity Framework for data access and will process requests asynchronously. However, it won't use a message broker for communication, as the receiver will be called directly by the API gateway.
+
+<h4 id="receiver-technology-stack">Technology Stack</h4>
+
+The receiver will be developed using .NET Core, facilitating easy integration with the handler. It will utilize Entity Framework for data access and will process requests asynchronously. However, it won't use a message broker for communication, as the receiver will be called directly by the API gateway.
+
+<h4 id="receiver-architecture">Architecture</h4>
+
+The receiver architecture will be the following:
+
+![Receiver Architecture](../_assets/img/receiver-architecture.png)
+
+- **ASCII Service:** This will be a fully in-house service responsible for managing ASCII artworks.
+- **Subscription & Payment Service:** We will utilize a third-party provider, such as Stripe, to manage payments and subscriptions.
+- **Ads Service:** We will implement a third-party service, such as Google AdSense, to manage advertisements on the site and generate revenue.
+- **User Service:** We will develop an in-house service to manage user accounts, including registration, login, and profile management. We will use JWT for authentication and authorization, and we will also offer GitHub login as an option.
+
+<h4 id="receiver-implementation">Implementation Instructions</h4>
+
+- Use dependency injection to inject the different services into the receiver's controllers.
