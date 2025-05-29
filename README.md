@@ -17,6 +17,7 @@ Software architecture notes and exercises.
 11. [Architecture Document](./_notes/11-architecture-document.md)
 12. [Case Study](./_notes/12-case-study.md)
 13. [Advance Architecture Topics](./_notes/13-advanced-architecture-topics.md)
+14. [Soft Skills](./_notes/14-soft-skills.md)
 
 ### References
 
